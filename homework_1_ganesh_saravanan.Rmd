@@ -9,22 +9,49 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+My Github repository for my assignments can be found at this URL:<https://github.com/gsaravanan1/rstudiodemo.git>
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r load_packages, warning=FALSE, message=FALSE}
+library(mdsr)
+library(tidyverse)
 ```
 
-## Including Plots
+Load the WorldCities data
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r WorldCities}
+data("WorldCities")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+QUESTION 1: How many observations and variables are there in this data set? What are
+some of the variable names? Type up your answer in your document using complete sentences.
+
+```{r glimpse}
+glimpse(WorldCities)
+```
+
+ANSWER 1: Observation=23,018 and Variable=10. Some variable names :code,name, latitude, longitude,populate, etc...
+
+
+QUESTION 2: There is a column called region in the data set. Can you extract this and show
+only the unique values?
+```{r extract_region}
+region_col <- WorldCities$region
+unique(region_col)
+```
+
+
+QUESTION 3: Can you extract and show the unique entries from the country column in
+WorldCities using one line of code and two %>% operators?
+
+```{r extract_unique_country}
+WorldCities %>% select(country) %>% unique()
+```
+
+
+QUESTION 4: Make one more histogram of the population and add a new x-label, a new ylabel,
+a new title (use ggtitle('my title')), and change the theme of the plot using theme_bw().
+
+```{r ggplot}
+p <-WorldCities %>% ggplot(aes(x = population)) + geom_histogram()
+p + labs(x = "Population", y = "Population_count", title = "City Population Histogram") + theme_bw()
+```
