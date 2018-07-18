@@ -1,0 +1,137 @@
+---
+title: "COMPSCIX 415.2 Homework 7"
+author: "Ganesh Saravanan"
+date: "7/18/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Exercise 1.
+```{r }
+train <- read.csv('~/Downloads/train.csv')
+dim(train)
+```
+There are 1,460 observations and 81 columns.
+
+## Exercise 2.
+### 1. Visualize the distribution of SalePrice.
+```{r message=FALSE}
+library(ggplot2)
+ggplot(data = train) + geom_histogram(aes(x = SalePrice))
+```
+
+### 2. Visualize the covariation between SalePrice and Neighborhood.
+```{r}
+ggplot(data = train, aes(x = Neighborhood, y = SalePrice)) +
+  geom_boxplot(aes(fill= Neighborhood)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+### 3. Visualize the covariation between SalePrice and OverallQual.
+```{r message=FALSE}
+train$OverallQual <- as.factor(train$OverallQual)
+ggplot(data = train, aes(x = OverallQual, y = SalePrice)) +
+  geom_boxplot(aes(fill= OverallQual)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+## Exercise 3.
+```{r}
+library(broom)
+fit <- lm(SalePrice ~1 , data=train)
+tidy(fit)
+
+```
+The coefficient is 180921.2
+```{r}
+mean(train$SalePrice)
+```
+The coefficient is the same as the average value of SalePrice.
+```{r}
+glance(fit)
+```
+R-square is 0.
+
+## Exercise 4
+```{r}
+# Now fit a linear regression model using GrLivArea, OverallQual, and Neighborhood as the features.
+options(tibble.print_max = Inf)
+fit2 <- lm(data = train, SalePrice ~ GrLivArea + OverallQual+ Neighborhood)
+tidy(fit2)
+```
+- How would you interpret the coefficients on GrLivArea and OverallQual?
+
+  GrLivArea and OverallQual are positive related to SalePrice. For 1 unit increases in GrLivArea,
+  the SalePrice will increase $51.37. For OverallQual, when the rating increases, the SalePrice increases as wel.
+  
+- How would you interpret the coefficient on NeighborhoodBrkSide?
+
+  NeighborhoodBrkSide is negative related to SalePrice. If the house is at NeighborhoodBrkSide,
+  the SalePrice will be lower by 23951. 
+  
+- Are the features significant?
+
+  GrLivArea is statistical significant. OverallQual rating from 6-10 are significant while the others are not. Some neighborhoods are significant to the SalePrice while some are not.
+
+- Are the features practically significant?
+
+  Yes they are practically significant.
+  
+- Is the model a good fit?
+
+```{r}
+glance(fit2)
+```
+The Adjusted R-squared is 0.8115, I think it provides a good fit.
+  
+## Exercise 6
+```{r message = FALSE, warning=FALSE}
+library(tibble)
+sim1a <- tibble(
+x = rep(1:10, each = 3),
+y = x * 1.5 + 6 + rt(length(x), df = 2)
+)
+
+fit_sim <- lm(data = sim1a, y~x)
+tidy(fit_sim)
+```
+```{r}
+glance(fit_sim)
+```
+The estimated coefficent of x is around 1.7 (the actual coefficent is 1.5), which is not bad. R-square is 0.9, which looks like a good fit.
+
+```{r}
+intercept_list <- rep(NA, 6)
+coef_list <- rep(NA,6)
+rsquare_list <- rep(NA,6)
+adj_rsquare_list <- rep(NA,6)
+for(i in 1:6){
+    sim1a <- tibble(
+  x = rep(1:10, each = 3),
+  y = x * 1.5 + 6 + rt(length(x), df = 2)
+  )
+
+fit_sim <- lm(data = sim1a, y~x)
+intercept_list[i] <- tidy(fit_sim)$estimate[1] # the estimate of intercept
+coef_list[i] <- tidy(fit_sim)$estimate[2] # the estimate of coefficent for x
+rsquare_list[i] <- glance(fit_sim)$r.squared # r square
+adj_rsquare_list[i] <- glance(fit_sim)$adj.r.squared # adjusted r square
+
+}
+
+```
+
+Rerun the simulated data 6 times, here is the coefficent for x:
+```{r}
+coef_list
+```
+
+Here is the rsquare:
+```{r}
+rsquare_list
+```
+We can see that the coefficent fluctuates around 1.5 and the rsquare varies a lot. Sometimes it provides a good fit, sometimes it does not.
+
