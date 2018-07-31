@@ -1,0 +1,40 @@
+---
+title: "COMPSCIX 415.2 Homework 8"
+author: "Ganesh Saravanan"
+date: "7/31/2018"
+output: html_document
+---
+
+```{r , warning=FALSE, message=FALSE}
+library(leaflet)
+library(tidyverse)
+library(jsonlite)
+library(htmltools)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## My Github repository for all of my assignments can be found at this URL below   <https://github.com/gsaravanan1/rstudiodemo.git>
+
+```{r}
+map_it <- function(city_names){
+  article_key <- "&apiKey=47c6112bedd632094e66481d70b75fa3039391de"
+  url <- "https://api.jcdecaux.com/vls/v1/stations?contract="
+  data_all <- data.frame()
+  for(c in city_names){
+    req <- fromJSON(paste0(url, c, article_key),flatten = TRUE)
+    data_all <- bind_rows(data_all, req)
+  }
+  
+  m <- leaflet(data_all) %>% addTiles() %>%
+  addMarkers(~position.lng, ~position.lat, label = ~~htmlEscape(as.character(available_bikes)))
+    
+  m  # Print the map
+}
+
+map_it('Luxembourg')
+
+```
+
